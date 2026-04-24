@@ -60,7 +60,21 @@ export type Permission =
   | 'annotate_drawings' | 'upload_drawings'
   | 'manage_users' | 'upload_documents'
 
-export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+type RoleMap = Record<UserRole, Permission[]>
+
+export const ROLE_PERMISSIONS: RoleMap = {
   gc_admin: [
     'create_rfi','respond_rfi','create_submittal','approve_submittal',
     'create_punch','close_punch','create_task','create_daily_report',
+    'view_all_daily_reports','annotate_drawings','upload_drawings',
+    'manage_users','upload_documents',
+  ],
+  gc_field: [
+    'create_rfi','create_submittal','create_punch','close_punch',
+    'create_task','create_daily_report','view_all_daily_reports',
+    'annotate_drawings','upload_drawings','upload_documents',
+  ],
+  owner: ['create_rfi','view_all_daily_reports'],
+  subcontractor: ['create_rfi','create_submittal','create_daily_report','upload_documents'],
+  architect: ['create_rfi','respond_rfi','create_submittal','approve_submittal','annotate_drawings','upload_drawings','upload_documents'],
+}
