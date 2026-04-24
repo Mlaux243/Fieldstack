@@ -14,7 +14,7 @@ interface ProjectMembership {
 interface AuthContextValue {
   session: Session | null
   user: User | null
-  profile: { id: string; full_name: string; phone: string | null } | null
+  profile: { id: string; full_name: string; company: string | null; phone: string | null; avatar_url: string | null; is_active: boolean } | null
   loading: boolean
   projects: ProjectMembership[]
   activeProject: ProjectMembership | null
