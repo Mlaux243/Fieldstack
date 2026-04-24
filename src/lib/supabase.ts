@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
-<<<<<<< HEAD
+
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env')
 }
@@ -50,7 +50,7 @@ export interface Project {
   start_date: string | null
   end_date: string | null
   is_active: boolean
-=======
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export type UserRole =
@@ -80,5 +80,5 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   owner:         ['create_rfi','view_all_daily_reports'],
   subcontractor: ['create_rfi','create_submittal','create_daily_report','upload_documents'],
   architect:     ['create_rfi','respond_rfi','create_submittal','approve_submittal','annotate_drawings','upload_drawings','upload_documents'],
->>>>>>> 99c2973af3b48ab7cc6e700c2f7fe3579880245f
+ 99c2973af3b48ab7cc6e700c2f7fe3579880245f
 }
