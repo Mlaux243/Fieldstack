@@ -1,0 +1,221 @@
+warning: in the working copy of 'src/contexts/AuthContext.tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/contexts/AuthContext.tsx b/src/contexts/AuthContext.tsx[m
+[1mindex 8199e2b..1b9648a 100644[m
+[1m--- a/src/contexts/AuthContext.tsx[m
+[1m+++ b/src/contexts/AuthContext.tsx[m
+[36m@@ -1,121 +1,132 @@[m
+[31m-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'[m
+[32m+[m[32m﻿import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'[m
+ import type { Session, User } from '@supabase/supabase-js'[m
+ import { supabase, type UserRole, type Permission, ROLE_PERMISSIONS } from '../lib/supabase'[m
+ [m
+ export type { UserRole } from '../lib/supabase'[m
+ [m
+ interface ProjectMembership {[m
+[31m-    project: { id: string; name: string; project_number: string | null; is_active: boolean }[m
+[31m-    role: UserRole[m
+[31m-    company: string | null[m
+[31m-    trade: string | null[m
+[32m+[m[32m  project: { id: string; name: string; project_number: string | null; is_active: boolean }[m
+[32m+[m[32m  role: UserRole[m
+[32m+[m[32m  company: string | null[m
+[32m+[m[32m  trade: string | null[m
+ }[m
+ [m
+ interface AuthContextValue {[m
+[31m-    session: Session | null[m
+[31m-    user: User | null[m
+[31m-    profile: { id: string; full_name: string; company: string | null; phone: string | null; avatar_url: string | null; is_active: boolean } | null[m
+[31m-    loading: boolean[m
+[31m-    projects: ProjectMembership[][m
+[31m-    activeProject: ProjectMembership | null[m
+[31m-    activeRole: UserRole | null[m
+[31m-    setActiveProject: (id: string) => void[m
+[31m-    can: (action: Permission) => boolean[m
+[31m-    signIn: (email: string, password: string) => Promise<{ error: string | null }>[m
+[31m-    signOut: () => Promise<void>[m
+[32m+[m[32m  session: Session | null[m
+[32m+[m[32m  user: User | null[m
+[32m+[m[32m  profile: { id: string; full_name: string; company: string | null; phone: string | null; avatar_url: string | null; is_active: boolean } | null[m
+[32m+[m[32m  loading: boolean[m
+[32m+[m[32m  projects: ProjectMembership[][m
+[32m+[m[32m  activeProject: ProjectMembership | null[m
+[32m+[m[32m  activeRole: UserRole | null[m
+[32m+[m[32m  setActiveProject: (id: string) => void[m
+[32m+[m[32m  can: (action: Permission) => boolean[m
+[32m+[m[32m  signIn: (email: string, password: string) => Promise<{ error: string | null }>[m
+[32m+[m[32m  signOut: () => Promise<void>[m
+ }[m
+ [m
+ const AuthContext = createContext<AuthContextValue | null>(null)[m
+ [m
+ export function AuthProvider({ children }: { children: React.ReactNode }) {[m
+[31m-    const [session, setSession] = useState<Session | null>(null)[m
+[31m-    const [user, setUser] = useState<User | null>(null)[m
+[31m-    const [profile, setProfile] = useState<any>(null)[m
+[31m-    const [projects, setProjects] = useState<ProjectMembership[]>([])[m
+[31m-    const [activeProject, setActiveProjectState] = useState<ProjectMembership | null>(null)[m
+[31m-    const [loading, setLoading] = useState(true)[m
+[32m+[m[32m  const [session, setSession] = useState<Session | null>(null)[m
+[32m+[m[32m  const [user, setUser] = useState<User | null>(null)[m
+[32m+[m[32m  const [profile, setProfile] = useState<any>(null)[m
+[32m+[m[32m  const [projects, setProjects] = useState<ProjectMembership[]>([])[m
+[32m+[m[32m  const [activeProject, setActiveProjectState] = useState<ProjectMembership | null>(null)[m
+[32m+[m[32m  const [loading, setLoading] = useState(true)[m
+ [m
+   const loadUserData = useCallback(async (userId: string) => {[m
+[31m-        try {[m
+[31m-                const controller = new AbortController()[m
+[31m-                const timeout = setTimeout(() => controller.abort(), 10000)[m
+[31m-                const [profileRes, memberRes] = await Promise.all([[m
+[31m-                          supabase.from('user_profiles').select('*').eq('id', userId).single(),[m
+[31m-                          supabase.from('project_users')[m
+[31m-                            .select('role, company, trade, project:projects(id,name,project_number,is_active)')[m
+[31m-                            .eq('user_id', userId)[m
+[31m-                        ])[m
+[31m-                clearTimeout(timeout)[m
+[31m-                if (profileRes.data) setProfile(profileRes.data)[m
+[31m-                const memberships: ProjectMembership[] = ((memberRes.data ?? []) as any[])[m
+[31m-                  .filter(m => m.project?.is_active)[m
+[31m-                  .map(m => ({ project: m.project, role: m.role, company: m.company, trade: m.trade }))[m
+[31m-                setProjects(memberships)[m
+[31m-                setActiveProjectState(memberships[0] ?? null)[m
+[31m-        } catch (err) {[m
+[31m-                console.error('loadUserData error:', err)[m
+[31m-                setProjects([])[m
+[31m-                setActiveProjectState(null)[m
+[31m-        }[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const timeoutPromise = new Promise((_, reject) =>[m
+[32m+[m[32m        setTimeout(() => reject(new Error('Request timeout')), 8000)[m
+[32m+[m[32m      )[m
+[32m+[m[32m      const dataPromise = Promise.all([[m
+[32m+[m[32m        supabase.from('user_profiles').select('*').eq('id', userId).single(),[m
+[32m+[m[32m        supabase.from('project_users')[m
+[32m+[m[32m          .select('role, company, trade, project:projects(id,name,project_number,is_active)')[m
+[32m+[m[32m          .eq('user_id', userId)[m
+[32m+[m[32m      ])[m
+[32m+[m[32m      const [profileRes, memberRes] = await Promise.race([dataPromise, timeoutPromise]) as any[m
+[32m+[m[32m      if (profileRes.data) setProfile(profileRes.data)[m
+[32m+[m[32m      const memberships: ProjectMembership[] = ((memberRes.data ?? []) as any[])[m
+[32m+[m[32m        .filter(m => m.project?.is_active)[m
+[32m+[m[32m        .map(m => ({ project: m.project, role: m.role, company: m.company, trade: m.trade }))[m
+[32m+[m[32m      setProjects(memberships)[m
+[32m+[m[32m      setActiveProjectState(memberships[0] ?? null)[m
+[32m+[m[32m    } catch (err) {[m
+[32m+[m[32m      console.error('loadUserData error:', err)[m
+[32m+[m[32m      setProjects([])[m
+[32m+[m[32m      setActiveProjectState(null)[m
+[32m+[m[32m    }[m
+   }, [])[m
+ [m
+   useEffect(() => {[m
+[31m-        let cancelled = false[m
+[31m-        supabase.auth.getSession().then(({ data: { session } }) => {[m
+[31m-                if (cancelled) return[m
+[31m-                setSession(session)[m
+[31m-                setUser(session?.user ?? null)[m
+[31m-                if (session?.user) {[m
+[31m-                          loadUserData(session.user.id).finally(() => { if (!cancelled) setLoading(false) })[m
+[31m-                } else {[m
+[31m-                          setLoading(false)[m
+[31m-                }[m
+[31m-        }).catch(() => { if (!cancelled) setLoading(false) })[m
+[31m-[m
+[31m-                const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {[m
+[31m-                        setSession(session)[m
+[31m-                        setUser(session?.user ?? null)[m
+[31m-                        if (session?.user) await loadUserData(session.user.id)[m
+[31m-                        else { setProfile(null); setProjects([]); setActiveProjectState(null) }[m
+[31m-                })[m
+[31m-[m
+[31m-                return () => { cancelled = true; subscription.unsubscribe() }[m
+[32m+[m[32m    let cancelled = false[m
+[32m+[m[32m    const loadingTimeout = setTimeout(() => {[m
+[32m+[m[32m      if (!cancelled) setLoading(false)[m
+[32m+[m[32m    }, 10000)[m
+[32m+[m
+[32m+[m[32m    supabase.auth.getSession().then(({ data: { session } }) => {[m
+[32m+[m[32m      if (cancelled) return[m
+[32m+[m[32m      setSession(session)[m
+[32m+[m[32m      setUser(session?.user ?? null)[m
+[32m+[m[32m      if (session?.user) {[m
+[32m+[m[32m        loadUserData(session.user.id).finally(() => {[m
+[32m+[m[32m          if (!cancelled) { clearTimeout(loadingTimeout); setLoading(false) }[m
+[32m+[m[32m        })[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        clearTimeout(loadingTimeout)[m
+[32m+[m[32m        setLoading(false)[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }).catch(() => {[m
+[32m+[m[32m      if (!cancelled) { clearTimeout(loadingTimeout); setLoading(false) }[m
+[32m+[m[32m    })[m
+[32m+[m
+[32m+[m[32m    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {[m
+[32m+[m[32m      setSession(session)[m
+[32m+[m[32m      setUser(session?.user ?? null)[m
+[32m+[m[32m      if (session?.user) await loadUserData(session.user.id)[m
+[32m+[m[32m      else { setProfile(null); setProjects([]); setActiveProjectState(null) }[m
+[32m+[m[32m    })[m
+[32m+[m
+[32m+[m[32m    return () => { cancelled = true; clearTimeout(loadingTimeout); subscription.unsubscribe() }[m
+   }, [loadUserData])[m
+ [m
+   const setActiveProject = useCallback((id: string) => {[m
+[31m-        const m = projects.find(p => p.project.id === id)[m
+[31m-        if (m) setActiveProjectState(m)[m
+[32m+[m[32m    const m = projects.find(p => p.project.id === id)[m
+[32m+[m[32m    if (m) setActiveProjectState(m)[m
+   }, [projects])[m
+ [m
+   const signIn = useCallback(async (email: string, password: string) => {[m
+[31m-        const { error } = await supabase.auth.signInWithPassword({ email, password })[m
+[31m-        return { error: error?.message ?? null }[m
+[32m+[m[32m    const { error } = await supabase.auth.signInWithPassword({ email, password })[m
+[32m+[m[32m    return { error: error?.message ?? null }[m
+   }, [])[m
+ [m
+   const signOut = useCallback(async () => {[m
+[31m-        await supabase.auth.signOut()[m
+[31m-        setProfile(null); setProjects([]); setActiveProjectState(null)[m
+[32m+[m[32m    await supabase.auth.signOut()[m
+[32m+[m[32m    setProfile(null); setProjects([]); setActiveProjectState(null)[m
+   }, [])[m
+ [m
+   const can = useCallback((action: Permission) => {[m
+[31m-        const role = activeProject?.role ?? null[m
+[31m-        if (!role) return false[m
+[31m-        return ROLE_PERMISSIONS[role]?.includes(action) ?? false[m
+[32m+[m[32m    const role = activeProject?.role ?? null[m
+[32m+[m[32m    if (!role) return false[m
+[32m+[m[32m    return ROLE_PERMISSIONS[role]?.includes(action) ?? false[m
+   }, [activeProject])[m
+ [m
+   return ([m
+[31m-        <AuthContext.Provider value={{[m
+[31m-                session, user, profile, loading,[m
+[31m-                projects, activeProject, activeRole: activeProject?.role ?? null,[m
+[31m-                setActiveProject, can, signIn, signOut,[m
+[31m-        }}>[m
+[31m-          {children}[m
+[31m-        </AuthContext.Provider>AuthContext.Provider>[m
+[31m-      )[m
+[32m+[m[32m    <AuthContext.Provider value={{[m
+[32m+[m[32m      session, user, profile, loading,[m
+[32m+[m[32m      projects, activeProject, activeRole: activeProject?.role ?? null,[m
+[32m+[m[32m      setActiveProject, can, signIn, signOut,[m
+[32m+[m[32m    }}>[m
+[32m+[m[32m      {children}[m
+[32m+[m[32m    </AuthContext.Provider>[m
+[32m+[m[32m  )[m
+ }[m
+ [m
+ export function useAuth() {[m
+[31m-    const ctx = useContext(AuthContext)[m
+[31m-    if (!ctx) throw new Error('useAuth must be used within AuthProvider')[m
+[31m-    return ctx[m
+[32m+[m[32m  const ctx = useContext(AuthContext)[m
+[32m+[m[32m  if (!ctx) throw new Error('useAuth must be used within AuthProvider')[m
+[32m+[m[32m  return ctx[m
+ }[m
+[41m+[m
